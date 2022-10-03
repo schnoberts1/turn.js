@@ -91,7 +91,7 @@ var has3d,
 		
 		// Size of the active zone of each corner
 
-		cornerSize: 100,
+		cornerSize: 300,
 
 		// Enables gradients
 
@@ -516,10 +516,35 @@ turnMethods = {
 
 		for (page in data.pageWrap)
 			if (has(page, data.pageWrap) && !turnMethods._necessPage.call(this, page))
+			{
+				var range = this.turn('range');
+				console.log(`Page ${page} not in DOM range ${range[0]}..${range[1]}`)
 				turnMethods._removePageFromDOM.call(this, page);
+			}
 		
 
 	},
+
+	_removeElementFromDOM: function(collection, page, remove, del) {
+		const htmlElement = collection[page].get()[0];
+		console.log(`_removeElementFromDOM ${page} ${remove} ${del} ${htmlElement}`)
+		if (htmlElement instanceof HTMLCanvasElement)
+		{
+			// This is a workaround to ensure that any Canvas we don't need
+			// that are left in browser cache (e.g Safari) don't consume much
+			// memory. Left as a red dot so a cleared page that finds its way
+			// into the DOM cache can hopefully be seen.
+			htmlElement.width = 1;
+			htmlElement.height = 1;
+			htmlElement.getContext("2d").rect(0, 0, 1, 1);
+			htmlElement.getContext("2d").fillStyle = "red";
+			htmlElement.getContext("2d").fill();
+		}
+		if (remove)
+			htmlElement.remove();
+		if (del)
+			delete collection[page];
+	},	
 
 	// Removes a page from DOM and its internal references
 
@@ -531,20 +556,20 @@ turnMethods = {
 			var dd = data.pages[page].data();
 			if (dd.f && dd.f.fwrapper)
 				dd.f.fwrapper.remove();
-			data.pages[page].remove();
-			delete data.pages[page];
+
+			turnMethods._removeElementFromDOM(data.pages, page, true, true);
 		}
 
 		if (data.pageObjs[page])
-			data.pageObjs[page].remove();
-
-		if (data.pageWrap[page]) {
-			data.pageWrap[page].remove();
-			delete data.pageWrap[page];
+		{
+			turnMethods._removeElementFromDOM(data.pageObjs, page, true, page > 1 /* was false */);
 		}
 
-		delete data.pagePlace[page];
+		if (data.pageWrap[page]) {
+			turnMethods._removeElementFromDOM(data.pageWrap, page, true, true);
+		}
 
+		delete data.pagePlace[page]
 	},
 
 	// Removes a page
@@ -876,7 +901,7 @@ turnMethods = {
 	// Turns to a page
 
 	_turnPage: function(page) {
-
+		console.log(`START: Turning to page ${page}`)
 		var current, next,
 			data = this.data(),
 			view = this.turn('view'),
@@ -925,6 +950,7 @@ turnMethods = {
 				data.pages[current].flip('turnPage');
 		}
 
+		console.log(`DONE: Turning to page ${page}`)
 	},
 
 	// Gets and sets a page

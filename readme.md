@@ -1,3 +1,15 @@
+Fork changes
+=========
+
+- Removed the timeout message as ....
+- added support for canvases so ....
+- I can use PDF.js with it
+- Added logging
+- Increased default corner size
+
+Note: Changed not tested with HTML display mode but I don't see why it won't work.
+
+vvvv Original README below vvvv
 
 turn.js 3rd release
 =========

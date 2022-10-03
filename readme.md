@@ -1,5 +1,4 @@
 
-![Bilby Stampede](http://turnjs.com/pics/small-turnjs-letters.
 turn.js 3rd release
 =========
 

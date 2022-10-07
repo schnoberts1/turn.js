@@ -242,7 +242,6 @@ turnMethods = {
 		}
 
 		var i, data = this.data(), ch = this.children();
-	
 		opts = $.extend({width: this.width(), height: this.height()}, turnOptions, opts);
 		data.opts = opts;
 		data.pageObjs = {};
@@ -518,7 +517,7 @@ turnMethods = {
 			if (has(page, data.pageWrap) && !turnMethods._necessPage.call(this, page))
 			{
 				var range = this.turn('range');
-				console.log(`Page ${page} not in DOM range ${range[0]}..${range[1]}`)
+				// console.log(`Page ${page} not in DOM range ${range[0]}..${range[1]}`)
 				turnMethods._removePageFromDOM.call(this, page);
 			}
 		
@@ -527,7 +526,7 @@ turnMethods = {
 
 	_removeElementFromDOM: function(collection, page, remove, del) {
 		const htmlElement = collection[page].get()[0];
-		console.log(`_removeElementFromDOM ${page} ${remove} ${del} ${htmlElement}`)
+		// console.log(`_removeElementFromDOM ${page} ${remove} ${del} ${htmlElement}`)
 		if (htmlElement instanceof HTMLCanvasElement)
 		{
 			// This is a workaround to ensure that any Canvas we don't need
@@ -719,11 +718,9 @@ turnMethods = {
 	// Gets and sets the size
 
 	size: function(width, height) {
-
 		if (width && height) {
 
 			var data = this.data(), pageWidth = (data.display=='double') ? width/2 : width, page;
-
 			this.css({width: width, height: height});
 
 			if (data.pageObjs[0])
@@ -901,7 +898,6 @@ turnMethods = {
 	// Turns to a page
 
 	_turnPage: function(page) {
-		console.log(`START: Turning to page ${page}`)
 		var current, next,
 			data = this.data(),
 			view = this.turn('view'),
@@ -949,8 +945,6 @@ turnMethods = {
 			else
 				data.pages[current].flip('turnPage');
 		}
-
-		console.log(`DONE: Turning to page ${page}`)
 	},
 
 	// Gets and sets a page

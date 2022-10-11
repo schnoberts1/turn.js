@@ -6,6 +6,7 @@ Fork changes
 - I can use PDF.js with it
 - Added logging
 - Increased default corner size
+- Disable all the swipe handling and handle that myself to work around an issue that I am sure I have introduced with the addition of async canvas rendering.
 
 Note: Changed not tested with HTML display mode but I don't see why it won't work.
 

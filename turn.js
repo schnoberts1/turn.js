@@ -31,8 +31,12 @@ var has3d,
 
 	isTouch = 'ontouchstart' in window,
 
-	events = (isTouch) ? {start: 'touchstart', move: 'touchmove', end: 'touchend'}
-			: {start: 'mousedown', move: 'mousemove', end: 'mouseup'},
+	// not-used - we aren't using event handling in turnjs as the turning on the 
+	// iOS safari doesn't seem to work quite right, skips pages when going backwards
+	// and skips first page. Probably to do with how I am using async rendered canvases
+	// but haven't found the defect. Lazy developer is lazy.
+	events = (isTouch) ? {start: 'not-used', move: 'not-used', end: 'not-used'}
+			: {start: 'not-used', move: 'not-used', end: 'not-used'},
 
 	// Contansts used for each corner
 	// tl * tr
@@ -234,7 +238,6 @@ turnMethods = {
 	// $('#selector').turn([options]);
 
 	init: function(opts) {
-
 		// Define constants
 		if (has3d===undefined) {
 			has3d = 'WebKitCSSMatrix' in window || 'MozPerspective' in document.body.style;
@@ -410,7 +413,6 @@ turnMethods = {
 	// Prepares the flip effect for a page
 
 	_makeFlip: function(page) {
-
 		var data = this.data();
 
 		if (!data.pages[page] && data.pagePlace[page]==page) {
@@ -418,9 +420,9 @@ turnMethods = {
 			var single = data.display=='single',
 				even = page%2;
 			
-			data.pages[page] = data.pageObjs[page].
-								css({width: (single) ? this.width() : this.width()/2, height: this.height()}).
-								flip({page: page,
+			data.pages[page] = data.pageObjs[page];
+			data.pageObjs[page].css({width: (single) ? this.width() : this.width()/2, height: this.height()});
+			data.pageObjs[page].flip({page: page,
 									next: (single && page === data.totalPages) ? page -1 : ((even || single) ? page+1 : page-1),
 									turn: this,
 									duration: data.opts.duration,
@@ -428,13 +430,13 @@ turnMethods = {
 									corners: (single) ? 'all' : ((even) ? 'forward' : 'backward'),
 									backGradient: data.opts.gradients,
 									frontGradient: data.opts.gradients
-									}).
-									flip('disable', data.disabled).
-									bind('pressed', turnMethods._pressed).
-									bind('released', turnMethods._released).
-									bind('start', turnMethods._start).
-									bind('end', turnMethods._end).
-									bind('flip', turnMethods._flip);
+									});
+									data.pageObjs[page].flip('disable', data.disabled);
+									data.pageObjs[page].bind('pressed', turnMethods._pressed);
+									data.pageObjs[page].bind('released', turnMethods._released);
+									data.pageObjs[page].bind('start', turnMethods._start);
+									data.pageObjs[page].bind('end', turnMethods._end);
+									data.pageObjs[page].bind('flip', turnMethods._flip);
 		}
 		return data.pages[page];
 	},
@@ -442,13 +444,17 @@ turnMethods = {
 	// Makes pages within a range
 
 	_makeRange: function() {
-
+		// Note: it's this call that breaks the turning with async PDF on iOS.
+		// All goes wrong in _addPage. I think it's to do with the z-factors
+		// which are one different when swiping vs left and right arrow.
 		var page,
 			data = this.data(),
 			range = this.turn('range');
 
 			for (page = range[0]; page<=range[1]; page++)
+			{
 				turnMethods._addPage.call(this, page);
+			}
 
 	},
 
@@ -517,7 +523,6 @@ turnMethods = {
 			if (has(page, data.pageWrap) && !turnMethods._necessPage.call(this, page))
 			{
 				var range = this.turn('range');
-				// console.log(`Page ${page} not in DOM range ${range[0]}..${range[1]}`)
 				turnMethods._removePageFromDOM.call(this, page);
 			}
 		
@@ -526,7 +531,6 @@ turnMethods = {
 
 	_removeElementFromDOM: function(collection, page, remove, del) {
 		const htmlElement = collection[page].get()[0];
-		// console.log(`_removeElementFromDOM ${page} ${remove} ${del} ${htmlElement}`)
 		if (htmlElement instanceof HTMLCanvasElement)
 		{
 			// This is a workaround to ensure that any Canvas we don't need
@@ -555,7 +559,6 @@ turnMethods = {
 			var dd = data.pages[page].data();
 			if (dd.f && dd.f.fwrapper)
 				dd.f.fwrapper.remove();
-
 			turnMethods._removeElementFromDOM(data.pages, page, true, true);
 		}
 
@@ -1038,7 +1041,7 @@ turnMethods = {
 	// This event is called in context of flip
 
 	_end: function(e, turned) {
-		
+
 		var that = $(this),
 			data = that.data().f,
 			opts = data.opts,
@@ -1102,7 +1105,6 @@ turnMethods = {
 	_flip: function() {
 
 		var opts = $(this).data().f.opts;
-
 		opts.turn.trigger('turn', [opts.next]);
 
 	},
@@ -1315,8 +1317,8 @@ flipMethods = {
 	_foldingPage: function(corner) {
 
 		var opts = this.data().f.opts;
-		
-		if (opts.folding) return opts.folding;
+		if (opts.folding)
+			return opts.folding;
 		else if(opts.turn) {
 			var data = opts.turn.data();
 			if (data.display == 'single')
@@ -1640,7 +1642,6 @@ flipMethods = {
 	},
 
 	_showFoldedPage: function(c, animate) {
-
 		var folding = flipMethods._foldingPage.call(this),
 			dd = this.data(),
 			data = dd.f;
@@ -1756,7 +1757,6 @@ flipMethods = {
 
 		var that = this,
 			data = this.data().f;
-
 		corner = {corner: (data.corner) ? data.corner.corner : corner || flipMethods._cAllowed.call(this)[0]};
 
 		var p1 = data.point || flipMethods._c.call(this, corner.corner, (data.opts.turn) ? data.opts.turn.data().opts.elevation : 0),
